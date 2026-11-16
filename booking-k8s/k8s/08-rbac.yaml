@@ -1,0 +1,33 @@
+# RBAC: обліковий запис booking-viewer має лише права на читання в просторі імен booking
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: booking-viewer
+  namespace: booking
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: booking-reader
+  namespace: booking
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: booking-viewer-binding
+  namespace: booking
+subjects:
+- kind: ServiceAccount
+  name: booking-viewer
+  namespace: booking
+roleRef:
+  kind: Role
+  name: booking-reader
+  apiGroup: rbac.authorization.k8s.io
